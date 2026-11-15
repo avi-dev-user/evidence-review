@@ -1,6 +1,8 @@
 ---
 name: evidence-review
 description: Deep, evidence-based code review of anything - a whole project with no diff, a path, uncommitted changes, a branch, or a GitHub PR / GitLab MR. Reproduces findings instead of guessing, judges layer choice and reuse like a strict maintainer, and writes a structured report with IDs, severity, status and verification.
+license: MIT
+compatibility: Agent Skills (SKILL.md) format. Built and tested on Claude Code; meant to work in any coding agent that loads SKILL.md skills and can run shell commands (Codex CLI, Cursor, GitHub Copilot and others). Needs git; gh or glab for PRs/MRs.
 disable-model-invocation: true
 argument-hint: "[path | diff | branch [base] | pr <number|url>] [--update <report.md>]"
 ---
@@ -24,7 +26,8 @@ long one padded to look thorough.
 
 ## 1. Resolve the scope
 
-Arguments given: "$ARGUMENTS" (empty quotes mean no arguments).
+Arguments given: "$ARGUMENTS" (empty quotes mean no arguments). If that still reads as a literal
+placeholder, your agent does not substitute arguments: take them from the user's request instead.
 
 | Argument | Scope | Mode | Output |
 |---|---|---|---|
@@ -108,11 +111,11 @@ Decide what "in scope" means before reading anything line by line.
   generated code, minified files, binaries, snapshots, large fixtures, API collections. Grep or
   skim them for what matters (a pinned vulnerable version, a secret, an endpoint list).
 - **Count what is left,** counting non-test source files only. Above roughly 40 files or 8,000
-  lines, split the code into areas
-  and fan out read-only subagents, one per area, to collect *candidate* findings with file:line
-  and reasoning. This is required at that size, not optional: one context cannot read it all, and
-  a silent skim is worse than an honest split. Every candidate is verified in the main thread
-  (section 7).
+  lines, split the code into areas and fan out read-only subagents, one per area, to collect
+  *candidate* findings with file:line and reasoning. This is required at that size, not optional:
+  one context cannot read it all, and a silent skim is worse than an honest split. Every candidate
+  is verified in the main thread (section 7). If your agent has no subagents, review one area per
+  pass, keep a written candidate list between passes, and say in Scope how the work was split.
 - **Tests:** read in full the tests that cover the riskiest paths and every test whose mocks a
   finding depends on; skim the rest for setup and coverage, and say so in Scope.
 - **Order by risk:** entry points and authentication first, then everything that writes to a data
@@ -134,8 +137,8 @@ Decide what "in scope" means before reading anything line by line.
 - **Keep the checkout clean.** Install with lockfile-respecting commands (`npm ci`,
   `pip install -r` with hashes where available, `uv sync --frozen`). Send build and coverage
   output outside the checkout, or confirm it is gitignored (test runners often write coverage into
-  the repo by default: pass the output directory, e.g. `jest --coverageDirectory <scratch>`). At the end, `git status` must show no
-  change you made.
+  the repo by default: pass the output directory, e.g. `jest --coverageDirectory <scratch>`). At
+  the end, `git status` must show no change you made.
 - Never run anything against production or shared environments. Production checks become
   recommendations with the exact command to run (for example a query plan on the live database).
 
