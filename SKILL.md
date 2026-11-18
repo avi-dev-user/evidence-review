@@ -79,9 +79,20 @@ Collect, and keep for the report header:
   - GitHub `https://github.com/<o>/<r>/blob/<sha>/<path>#L<a>-L<b>`
   - GitLab `https://<host>/<group>/<repo>/-/blob/<sha>/<path>#L<a>-<b>`
   - anything else: `path:line`.
-- Project rules: `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, lint/type configs, PR templates,
-  and rules files in parent directories. Findings are judged against the project's own rules
-  first, general taste second.
+- **Project rules.** Read every instruction file that applies to the code in scope, and follow
+  imports inside them (a line such as `@AGENTS.md` pulls in that file):
+  1. In the package and the repository: `CLAUDE.md`, `AGENTS.md`, `CONTRIBUTING.md`, lint,
+     format and type configs, PR templates.
+  2. Rules files in parent directories above the repository root.
+  3. The user-level instruction file of the agent you run in, for example `~/.claude/CLAUDE.md`
+     or `~/.codex/AGENTS.md`. Skip it if it does not exist.
+
+  When two files disagree, the one closest to the code wins: package over repository,
+  repository over parent directories, all of them over the user-level file. The user-level file
+  is the reviewer's own taste, not a rule of someone else's project: when the code belongs to
+  another project (an upstream PR, a repository the user does not maintain), file nothing that
+  rests only on it. Findings are judged against these rules first, general taste second. List
+  the files read in the report's Rules row.
 - What the system is for: README, docs, deploy manifests, CI config, entry points.
 - For a PR: its description, linked issues, existing review comments and their resolution, and
   the target branch. Read earlier rounds of review so you do not re-raise settled points, and
@@ -94,7 +105,8 @@ rules in a parent directory; the audience (an upstream open-source PR gets Engli
 language of the project's existing docs. If none applies, it is an open question.
 
 **Open questions.** Gather every open question from sections 1 and 2 (scope, base branch,
-audience, a concern the requester wants covered, language, intent) and ask them **together, in
+audience, a concern the requester wants covered, language, intent, a rule the rules files
+leave undecided) and ask them **together, in
 one message**. Do not ask anything you can find yourself. If no one can answer (a non-interactive
 run, or the user said not to ask), use these defaults and list each one under "Assumptions" in the
 report header: project mode for no arguments; maintainers as the audience; English; no named
@@ -214,12 +226,13 @@ For every candidate that could be High or Critical, and any Medium where it is c
 
 Label each finding's evidence:
 
-- **yes**: reproduced by running code.
+- **yes**: reproduced by running code, including the project's own linter or formatter.
 - **partly**: part of the claim reproduced; the section says which part.
-- **artifact**: shown by a file, manifest, image layer or commit, where running it is not
-  possible here (a missing deploy variable, a secret in history).
+- **artifact**: shown by a file, manifest, image layer or commit, or by a search that proves
+  presence or absence (a grep, a path that does not exist), where running code is not possible
+  or not needed (a missing deploy variable, a secret in history, a dangling reference).
 - **no**: attempted and could not reproduce; say why it is still reported, or drop it.
-- **not tried**: reasoning only.
+- **not tried**: reasoning only, including a judgment made by reading the code.
 
 Then be honest:
 
@@ -237,7 +250,9 @@ reachable, and state next to it what would lower it.
 - **Critical**: exploitable now, with serious impact.
 - **High**: data loss, cross-tenant or cross-user access, or a broken core feature.
 - **Medium**: a real bug or risk that needs specific conditions.
-- **Low**: hygiene, maintainability, docs, dependency drift.
+- **Low**: hygiene, maintainability, docs, dependency drift, comment and style rules. A comment
+  that contradicts the code on a security, locking or data-integrity path is at least Medium:
+  the next person to change that code will trust it.
 
 For a library, judge by the impact on a typical consumer. For a single-user tool, data loss is
 still High, and a security finding needs a realistic attacker.
@@ -246,7 +261,8 @@ In change mode, also tag each finding:
 
 - **Blocking**: a new Critical or High, or a new Medium on the main path of the change.
 - **Non-blocking**: worth doing, fine as a follow-up.
-- **Nit**: style or taste, take it or leave it.
+- **Nit**: taste only, take it or leave it. A violation of a written project rule is
+  non-blocking, not a nit, unless the rules file says it blocks.
 - **New** or **pre-existing**: pre-existing issues are reported separately and never block the
   change under review.
 

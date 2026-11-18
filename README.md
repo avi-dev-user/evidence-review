@@ -65,7 +65,8 @@ in Claude Code it never starts on its own.
 4. Maps entry points, trust boundaries, data stores, outbound calls and real data shapes.
 5. Reads the code with a reviewer lens: intent, layer and placement, reuse, correctness,
    concurrency, security and tenant isolation, validation, performance, contracts, operations,
-   tests, tooling, drift, and conditional dimensions (migrations, privacy, frontend, LLM code).
+   tests, tooling, drift, comments and style against the project's own rules files, and
+   conditional dimensions (migrations, privacy, frontend, LLM code).
 6. Verifies candidates against real dependencies at small scale, with a cap on effort per
    finding, and labels each one: `yes`, `partly`, `artifact`, `no` or `not tried`.
 7. Classifies by severity (and blocking / non-blocking / nit for changes) and writes the result.

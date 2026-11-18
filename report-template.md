@@ -14,6 +14,7 @@ the copyright header the project requires, as an HTML comment.
 | Revision | `<short sha>` (branch `<branch>`) |
 | Links | <"Point to <host> at `<sha>`" or "Local paths; the revision is not pushed"> |
 | Scope | <read in full / skimmed / skipped, explicitly; library internals read> |
+| Rules | <instruction files read, closest to the code first; "none found" if none> |
 | Assumptions | <defaults used because no one could answer, and reachability assumptions; omit if none> |
 | Requested by | <name; omit the row if not given> |
 
@@ -39,7 +40,7 @@ no further work is planned; the section says why.
 | ID | Severity | Status | Finding | Reproduced |
 |---|---|---|---|---|
 | [C1](#c1) | Critical | Open | <one line> | yes / partly / artifact / no / not tried |
-| [L1-Ln](#low) | Low | see each item | Hygiene, dead code, duplication, dependencies, docs | see each item |
+| [L1-Ln](#low) | Low | see each item | Hygiene, dead code, duplication, dependencies, docs, comments and style | see each item |
 
 ### How this review was done
 

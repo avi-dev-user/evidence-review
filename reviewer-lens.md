@@ -213,8 +213,32 @@ The first design question, before line-level review.
   docs that no longer match the code.
 - Supply chain: new dependencies (maintenance, license compatibility, install scripts), type
   packages mismatched with their runtime packages, deprecated stubs.
-- Project rules: comment language, required headers, commit conventions, whatever the project's
-  own instructions require.
+- Project rules: required headers, commit conventions, whatever the project's own instructions
+  require. A rule phrased as an instruction for writing new code (headers on new files, a style
+  for new components) is checked only against code the change under review adds. In project
+  mode it produces no findings on existing code; at most, a note in Scope saying how much of the
+  repository follows it.
+- **Comments and style against the project's rules.** First write down each comment and style
+  rule from the rules files (SKILL.md section 2), with the file it came from and which one wins
+  where they conflict. Check each rule against the code in scope: grep where a rule is
+  mechanical (a banned marker, a language, a required header), read where it is not (whether a
+  comment explains why). Where a configured linter or formatter covers a rule, run it and use
+  its result as the evidence. If no script, hook or CI step runs it, say so, and report the
+  formatting state once for the repository, not once per file. If no rules file says anything
+  about comments or style, file nothing here except the items below.
+- When the rules leave a question undecided (which comment language applies, whether the code
+  counts as public), ask it with the other open questions (SKILL.md section 2). If no one can
+  answer, file only what holds under every reading (two languages in one file is a finding
+  whichever language is right) and list the undecided rule under Assumptions.
+- Whatever the rules files say, these are findings:
+  - A comment that contradicts the code it describes. Show the claim and the line that
+    disproves it. Workarounds built on the false claim belong in the same finding.
+  - A reference that cannot be followed: a document, section, path or note that does not exist
+    in the repository or anywhere a reader of the code can open. Check the path before filing.
+  - Code disabled by commenting it out, with no date and no reason next to it.
+- Report these per rule, not per comment: one finding with the rule, its source file, a count,
+  and three to five `file:line` examples (every instance when there are fewer). In change mode, check only comments the change adds or
+  edits; older ones go under Pre-existing as one grouped item.
 
 ## 14. What is in good shape
 
